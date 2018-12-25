@@ -1,0 +1,14 @@
+<mat-sidenav-container>
+  <mat-sidenav mode="over"
+               position="end"
+               [fixedInViewport]="true"
+               [autoFocus]="false"
+               #filterSlide>
+    <app-slide-filters></app-slide-filters>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <app-page-header [filterSlideOpen]="filterSlide.open"></app-page-header>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
