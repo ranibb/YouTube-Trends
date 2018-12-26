@@ -20,12 +20,14 @@ import { YoutubeComponent } from '@modules/youtube/youtube.component';
 import { VideoComponent } from '@modules/youtube/components/video.component';
 import { YoutubeService } from '@modules/youtube/service/youtube.service';
 import { PlayerComponent } from '@modules/youtube/player/player.component';
+import { SafePipe } from './safe.pipe';
 
 @NgModule({
   declarations: [
     YoutubeComponent,
     VideoComponent,
-    PlayerComponent
+    PlayerComponent,
+    SafePipe
   ],
   imports     : [
     CommonModule,
