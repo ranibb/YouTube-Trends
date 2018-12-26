@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { appConfig } from 'appConfig';
@@ -12,6 +12,10 @@ import { ContextService } from '@shared/context.service';
   styleUrls  : [ './slide-filters.component.scss' ]
 })
 export class SlideFiltersComponent implements OnInit {
+
+  @Input()
+  public filterSlide: any;
+
   public countryFormControl: FormControl = new FormControl();
   public countryList: ICountryListModel[] = appConfig.countryList;
 

@@ -18,7 +18,8 @@ import { ContextService } from '@shared/context.service';
   template: ''
 })
 class HeaderComponent {
-  @Input() public filterSlideOpen: any;
+  @Input()
+  public filterSlide: any;
 }
 
 describe('AppComponent', () => {
