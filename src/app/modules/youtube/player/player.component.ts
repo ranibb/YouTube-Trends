@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { first } from 'rxjs/internal/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -14,6 +14,9 @@ import { YoutubeService } from '../service/youtube.service';
 export class PlayerComponent implements OnInit {
   public embedUrl: string;
   public videoLoader: boolean;
+
+  @ViewChild('videoFrame')
+  videoFrame: ElementRef;
 
   constructor(private appContext: ContextService,
               private route: ActivatedRoute,
@@ -45,7 +48,12 @@ export class PlayerComponent implements OnInit {
 
   /* On video ready hide loader */
   public loadVideo(): void {
-    this.videoLoader = false;
+    const src = this.videoFrame.nativeElement.src;
+    if (src.includes('undefined')) {
+      return;
+    } else {
+      this.videoLoader = false;
+    }
   }
 
 }

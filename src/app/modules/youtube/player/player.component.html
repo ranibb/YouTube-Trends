@@ -2,7 +2,7 @@
   <div class="gl-loading showLoading" *ngIf="videoLoader">
     <div class="spinner"></div>
   </div>
-  <iframe (load)='loadVideo()' width="100%" height="100%" [src]="embedUrl | safe" frameborder="0" allowfullscreen></iframe>
+  <iframe #videoFrame (load)='loadVideo()' width="100%" height="100%" [src]="embedUrl | safe" frameborder="0" allowfullscreen></iframe>
 </div>
 
 <div class="controls">
