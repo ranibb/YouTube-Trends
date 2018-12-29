@@ -1,4 +1,4 @@
-<div class="card" [routerLink]="['/youtube', video.id]">
+<div class="card" (click)="onSelect(video.id)" [routerLink]="['/youtube', video.id]">
   <div class="img-container">
     <img [src]="video.thumbnail" *ngIf="video.thumbnail">
     <mat-icon>movie</mat-icon>

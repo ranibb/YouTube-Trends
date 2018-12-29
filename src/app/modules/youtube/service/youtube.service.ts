@@ -12,6 +12,15 @@ export class YoutubeService {
   constructor(private http: HttpClient) {
   }
 
+  public checkVideoExist(vid: string) {
+    const params: any = {
+      part: 'id',
+      id: vid,
+      key: appConfig.youtubeApiKey
+    };
+    return this.http.get<any>(appConfig.getYoutubeEndPoint('videos'), { params });
+  }
+
   public getTrendingVideos(videosPerPage?: number): Observable<VideoClass[]> {
     const params: any = {
       part           : appConfig.partsToLoad,
