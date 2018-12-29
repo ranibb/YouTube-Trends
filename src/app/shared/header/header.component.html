@@ -6,7 +6,7 @@
     <div class="opened-module-title">
       {{title$ | async}}
     </div>
-    <button mat-button class="menu-toggle" (click)="filterSlide.open()">
+    <button mat-button class="menu-toggle" (click)="filterSlide.open()" *ngIf="sideNavGear">
       <mat-icon>settings</mat-icon>
     </button>
   </nav>

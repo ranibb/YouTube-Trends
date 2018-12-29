@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { appConfig } from 'appConfig';
+import { ContextService } from '@shared/context.service';
 
 @Component({
   selector   : 'app-player',
@@ -11,7 +12,10 @@ export class PlayerComponent implements OnInit {
   public embedUrl: string;
   public videoLoader: boolean;
 
+  constructor(private appContext: ContextService) {}
+
   public ngOnInit() {
+    this.appContext.hideSideNavGear.next(true);
     const id = window.location.href
                      .replace(/^.*\//g, '')
                      .replace(/^.*\..*/g, '');

@@ -23,6 +23,7 @@ export class YoutubeComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this.appContext.hideSideNavGear.next(false);
     this.appContext.moduleTitle.next('YOUTUBE');
     this.loadVideos();
     this.appContext.videosCountPerPage.subscribe((count) => this.loadVideos(count));
