@@ -41,7 +41,6 @@ export class PlayerComponent implements OnInit {
                 this.embedUrl = appConfig.getYoutubeEmbdedUrl(id);
               } else { this.router.navigate(['/youtube']); }
             });
-          this.embedUrl = appConfig.getYoutubeEmbdedUrl(id);
         }
       });
   }

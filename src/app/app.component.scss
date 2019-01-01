@@ -7,6 +7,10 @@ mat-sidenav {
   background : #f9e5c0;
 }
 
+.mat-drawer {
+  z-index: 102;
+}
+
 mat-sidenav-container {
   padding-top : 50px;
   height      : 100%;

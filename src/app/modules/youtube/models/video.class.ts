@@ -20,7 +20,7 @@ export class VideoClass {
       .fromNow();
 
     const viewCount = parseInt(data[ 'statistics' ][ 'viewCount' ], 10);
-    const likeCount = parseInt(data[ 'statistics' ][ 'l1keCount' ], 10);
+    const likeCount = parseInt(data[ 'statistics' ][ 'likeCount' ], 10);
     this.viewCount = isNaN(viewCount) ? 0 : viewCount;
     this.likeCount = isNaN(likeCount) ? 0 : likeCount;
   }
