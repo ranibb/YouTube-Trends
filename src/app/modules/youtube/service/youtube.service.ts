@@ -5,11 +5,12 @@ import { map, catchError } from 'rxjs/internal/operators';
 
 import { appConfig } from 'appConfig';
 import { VideoClass } from '../models/video.class';
+import { ContextService } from '@shared/context.service';
 
 @Injectable()
 export class YoutubeService {
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private appContext: ContextService) {
   }
 
   public checkVideoExist(vid: string) {
@@ -21,25 +22,34 @@ export class YoutubeService {
     return this.http.get<any>(appConfig.getYoutubeEndPoint('videos'), { params });
   }
 
-  public getTrendingVideos(videosPerPage?: number): Observable<VideoClass[]> {
+  public getTrendingVideos(
+    videosPerPage?: number,
+    nextToken?: boolean,
+    token?: string,
+    code?: string,
+    catg?: string): Observable<VideoClass[]> {
+
     const params: any = {
       part           : appConfig.partsToLoad,
       chart          : appConfig.chart,
-      videoCategoryId: appConfig.defaultCategoryId,
-      regionCode     : appConfig.defaultRegion,
+      videoCategoryId: catg ? catg : appConfig.defaultCategoryId,
+      regionCode     : code ? code : appConfig.defaultRegion,
       maxResults     : videosPerPage ? videosPerPage : appConfig.maxVideosToLoad,
-      key            : appConfig.youtubeApiKey
+      key            : appConfig.youtubeApiKey,
+      pageToken      : token ? token : ''
     };
 
-    return this.http.get<any>(appConfig.getYoutubeEndPoint('videos'), {params})
-               .pipe(
-                 map(
-                   (data) => data.items
-                                 .map((item) => new VideoClass(item))
-                                 .filter((item) => item.id !== '')
-                 ),
-                 catchError(this.handleError('getTrendingVideos'))
-               ) as Observable<VideoClass[]>;
+    return this.http.get<any>(appConfig.getYoutubeEndPoint('videos'), { params })
+      .pipe(
+        map(
+          (data) => {
+            if (nextToken) { this.appContext.pageToken.next(data.nextPageToken); }
+            return data.items
+              .map((item: any) => new VideoClass(item))
+              .filter((item: any) => item.id !== '');
+          }),
+        catchError(this.handleError('getTrendingVideos'))
+      ) as Observable<VideoClass[]>;
   }
 
   private handleError(operation: string = 'operation') {

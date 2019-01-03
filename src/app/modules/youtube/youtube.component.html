@@ -1,4 +1,4 @@
-<div id="youtube" *ngIf="(trendingVideos | async) as videos; else loadingOrError">
+<div id="youtube" *ngIf="(trendingVideos$ | async) as videos; else loadingOrError">
   <div class="row">
     <div class="card-container"
          *ngFor="let video of videos">

@@ -7,6 +7,7 @@ export const appConfig = {
   defaultRegion      : 'US',
   defaultCategoryId  : 10,
   maxVideosToLoad    : 24,
+  token              : '',
   countryList        : [
     {name: 'Afghanistan', code: 'AF'},
     {name: 'Åland Islands', code: 'AX'},
