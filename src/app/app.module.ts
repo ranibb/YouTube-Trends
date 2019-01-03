@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { RouterModule, PreloadAllModules } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { StorageServiceModule } from 'ngx-webstorage-service';
 
 /* Material UI */
 import {
@@ -40,6 +41,7 @@ import { SlideFiltersComponent } from '@shared/slide-filters/slide-filters.compo
     MatInputModule,
     MatSidenavModule,
     MatSliderModule,
+    StorageServiceModule,
     RouterModule.forRoot(ROUTES, {
       useHash           : Boolean(history.pushState) === false,
       preloadingStrategy: PreloadAllModules

@@ -1,12 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/internal/operators';
+import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
 
 import { appConfig } from 'appConfig';
 import { ICountryListModel } from '@shared/models/country-list.interface';
 import { ICategoryListInterface } from '@shared/models/category-list.interface';
 import { ContextService } from '@shared/context.service';
+
+const STORAGE_KEY = 'youtube_filters';
 
 @Component({
   selector   : 'app-slide-filters',
@@ -33,7 +36,9 @@ export class SlideFiltersComponent implements OnInit {
   public defaultVideosOnPage: number = appConfig.maxVideosToLoad;
   public count: number;
 
-  constructor(private appContext: ContextService , private router: Router) {
+  constructor(private appContext: ContextService,
+              private router: Router,
+              @Inject(SESSION_STORAGE) public storage: StorageService) {
   }
 
   public ngOnInit() {
@@ -48,9 +53,23 @@ export class SlideFiltersComponent implements OnInit {
   public onChangeVideosPerPage(count: number) {
     this.count = count;
     this.router.navigate(['/youtube'], { queryParams: { count: this.count } });
+    this.saveState();
+  }
+
+  public saveState() {
+    this.storage.set(STORAGE_KEY, {
+       videosOnPage: this.count
+     });
   }
 
   private setDefaults() {
+    const savedFilters = this.storage.get(STORAGE_KEY);
+
+    if (savedFilters) {
+      console.log(savedFilters);
+      this.appContext.videosCountPerPage.next(savedFilters.videosOnPage);
+    }
+
     const defaultCountry = this.countryList.find((country) =>
       country.code === appConfig.defaultRegion).name;
     const defaultCategory = this.categoriesList.find((country) =>
@@ -58,6 +77,7 @@ export class SlideFiltersComponent implements OnInit {
 
     this.countryFormControl.setValue(defaultCountry);
     this.categoryFormControl.setValue(defaultCategory);
+
     if (!this.count) {
       this.appContext.videosCountPerPage.subscribe((count) => {
         this.videosPerPageFormControl.setValue(count);
