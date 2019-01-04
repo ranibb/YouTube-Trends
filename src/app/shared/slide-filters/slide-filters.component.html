@@ -14,7 +14,7 @@
          [formControl]="countryFormControl"
          [matAutocomplete]="countryAuto">
   <mat-autocomplete #countryAuto="matAutocomplete">
-    <mat-option *ngFor="let county of countryList" [value]="county.name">
+    <mat-option *ngFor="let county of countryList$ | async" [value]="county.name">
       {{county.name}}
     </mat-option>
   </mat-autocomplete>
@@ -29,7 +29,7 @@
          [formControl]="categoryFormControl"
          [matAutocomplete]="categoryAuto">
   <mat-autocomplete #categoryAuto="matAutocomplete">
-    <mat-option *ngFor="let category of categoriesList" [value]="category.name">
+    <mat-option *ngFor="let category of categoriesList$ | async" [value]="category.name">
       {{category.name}}
     </mat-option>
   </mat-autocomplete>

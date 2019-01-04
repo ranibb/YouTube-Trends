@@ -30,7 +30,7 @@ export class YoutubeComponent implements OnInit {
   public ngOnInit(): void {
     this.appContext.hideSideNavGear.next(false);
     this.appContext.moduleTitle.next('YOUTUBE');
-    this.route.queryParams.subscribe((data) => this.videosfunc(data.count));
+    this.route.queryParams.subscribe((data) => this.videosfunc(data.count, data.country, data.category));
 
     this.trendingVideos$ = this.newVideos$.pipe(
       map((data) => {
@@ -40,11 +40,13 @@ export class YoutubeComponent implements OnInit {
       }));
   }
 
-  public videosfunc(count: number) {
+  public videosfunc(count: number, country?: string, catg?: string) {
     this.videos = [];
     this.params.videosPerPage = count;
     this.params.saveToken = false;
     this.params.token = '';
+    this.params.country = country;
+    this.params.catg = catg;
 
     if (count <= 50) {
         this.loadVideos(this.params);
@@ -65,7 +67,8 @@ export class YoutubeComponent implements OnInit {
   }
 
   private loadVideos(params: LoadVidoesParam) {
-    this.youtubeService.getTrendingVideos(params.videosPerPage, params.saveToken, params.token)
+    // console.log(params);
+    this.youtubeService.getTrendingVideos(params.videosPerPage, params.saveToken, params.token, params.country, params.catg)
       .pipe(
         catchError((error: any) => {
           this.loadingError$.next(true);
