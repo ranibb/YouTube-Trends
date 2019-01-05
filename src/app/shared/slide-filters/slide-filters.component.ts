@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/internal/operators';
 import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
 
@@ -29,12 +29,8 @@ export class SlideFiltersComponent implements OnInit {
 
   public categoryFormControl: FormControl = new FormControl();
   public categoriesList$: Observable<ICategoryListInterface[]>;
-  public categories: ICategoryListInterface[] = [
-    {name: 'Film & Animation', id: 1},
-    {name: 'Autos & Vehicles', id: 2},
-    {name: 'Music', id: 10},
-    {name: 'Pets & Animals', id: 4}
-  ];
+  public categories: ICategoryListInterface[] = [];
+  public categoriesSubscription: Subscription;
   public categoryId: any = '';
 
   public videosPerPageFormControl: FormControl = new FormControl();
@@ -50,6 +46,16 @@ export class SlideFiltersComponent implements OnInit {
         startWith(''),
         map((country) => country ? this.filterCountries(country) : this.countries.slice())
       );
+
+    this.categoriesSubscription = this.appContext.videosCategoryList
+      .subscribe((categories) => {
+        this.updateCategories(categories);
+      });
+  }
+
+  public updateCategories(categories) {
+    this.categories = categories;
+    console.log(this.categories);
 
     this.categoriesList$ = this.categoryFormControl.valueChanges
       .pipe(
@@ -76,7 +82,8 @@ export class SlideFiltersComponent implements OnInit {
       .subscribe((value) => {
       const country = appConfig.countryList.find((obj) => obj.name === value);
       if (country) {
-        this.loadCountryTrend(country);
+        this.countryCode = country.code;
+        this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
       }
     });
 
@@ -84,7 +91,8 @@ export class SlideFiltersComponent implements OnInit {
       .subscribe((value) => {
         const category = this.categories.find((item) => item.name === value);
         if (category) {
-          this.loadCategoryTrend(category);
+          this.categoryId = category.id;
+          this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
         }
       });
 
@@ -92,52 +100,65 @@ export class SlideFiltersComponent implements OnInit {
       .pipe(
         debounceTime(1000),
         distinctUntilChanged())
-      .subscribe((count) => this.onChangeVideosPerPage(count));
+      .subscribe((count) => {
+        this.count = count;
+        this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
+        // this.saveState();
+      });
   }
 
   public loadCountryTrend(country) {
-    this.countryCode = country.code;
-    this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
+
   }
 
   public loadCategoryTrend(category) {
-    this.categoryId = category.id;
-    this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
+
   }
 
   public onChangeVideosPerPage(count: number) {
-    this.count = count;
-    this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
-    this.saveState();
+
   }
 
-  public saveState() {
-    this.storage.set(STORAGE_KEY, {
-       videosOnPage: this.count
-     });
-  }
+  // public saveState() {
+  //   this.storage.set(STORAGE_KEY, {
+  //      videosOnPage: this.count
+  //    });
+  // }
 
   private setDefaults() {
     const savedFilters = this.storage.get(STORAGE_KEY);
 
-    if (savedFilters) {
-      console.log(savedFilters);
-      this.appContext.videosCountPerPage.next(savedFilters.videosOnPage);
-    }
+    // if (savedFilters) {
+    //   console.log(savedFilters);
+    //   this.appContext.videosCountPerPage.next(savedFilters.videosOnPage);
+    // }
 
-    const defaultCountry = this.countries.find((country) =>
-      country.code === appConfig.defaultRegion).name;
-    const defaultCategory = this.categories.find((country) =>
-      country.id === appConfig.defaultCategoryId).name;
+    if (!this.countryCode || !this.categoryId || !this.count ) {
 
-    this.countryFormControl.setValue(defaultCountry);
-    this.categoryFormControl.setValue(defaultCategory);
-
-    if (!this.count) {
-      this.appContext.videosCountPerPage.subscribe((count) => {
-        this.videosPerPageFormControl.setValue(count);
-        this.onChangeVideosPerPage(count);
+      this.appContext.selectedCountry.subscribe((countryCode) => {
+        this.countryCode = countryCode;
+        const defaultCountry = this.countries.find((country) => country.code === countryCode).name;
+        this.countryFormControl.setValue(defaultCountry);
       });
+
+      this.appContext.selectedCategory.subscribe((categoryId) => {
+        this.categoryId = categoryId;
+      });
+
+      this.appContext.videosCategoryList.subscribe((categories) => {
+        if (categories.length) {
+        // tslint:disable-next-line:triple-equals
+        const defaultCategory = categories.find((category) => category.id == this.categoryId).name;
+        this.categoryFormControl.setValue(defaultCategory);
+        }
+      });
+
+      this.appContext.videosCountPerPage.subscribe((count) => {
+        this.count = count;
+        this.videosPerPageFormControl.setValue(count);
+      });
+
+      this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
     }
   }
 }

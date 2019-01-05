@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, Subscription } from 'rxjs';
 import { catchError, map } from 'rxjs/internal/operators';
 import { throwError } from 'rxjs/index';
 import { ActivatedRoute } from '@angular/router';
@@ -64,6 +64,22 @@ export class YoutubeComponent implements OnInit {
             }
         });
     }
+    this.updateCategoriesByCountryCode(this.params.country);
+  }
+
+  public updateCategoriesByCountryCode(countryCode: string) {
+    const subscription: Subscription = this.youtubeService.getVideoCategoriesByCountryCode(countryCode)
+      .pipe(
+        catchError((error: any) => {
+          return throwError(error);
+        })
+      ).subscribe( (videoCategories) => {
+        this.appContext.videosCategoryList.next(videoCategories);
+
+        if (subscription) {
+          subscription.unsubscribe();
+        }
+      });
   }
 
   private loadVideos(params: LoadVidoesParam) {

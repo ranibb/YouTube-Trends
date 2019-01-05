@@ -5,6 +5,7 @@ import { map, catchError } from 'rxjs/internal/operators';
 
 import { appConfig } from 'appConfig';
 import { VideoClass } from '../models/video.class';
+import { VideoCategoryClass } from '../models/video-category.class';
 import { ContextService } from '@shared/context.service';
 
 @Injectable()
@@ -50,6 +51,26 @@ export class YoutubeService {
           }),
         catchError(this.handleError('getTrendingVideos'))
       ) as Observable<VideoClass[]>;
+  }
+
+  public getVideoCategoriesByCountryCode(countryCode: string): Observable<VideoCategoryClass[]> {
+
+    const params: any = {
+      part          : 'id, snippet',
+      chart         : appConfig.chart,
+      regionCode    : countryCode,
+      key           : appConfig.youtubeApiKey
+    };
+
+    return this.http.get<any>(appConfig.getYoutubeEndPoint('videoCategories'), { params })
+      .pipe(
+        map(
+          (data) => data.items
+            .filter((item) => item.id !== '' && item.snippet && item.snippet.assignable)
+            .map((item) => new VideoCategoryClass(item))
+        ),
+        catchError(this.handleError('getVideoCategoriesByCountry'))
+      ) as Observable<VideoCategoryClass[]>;
   }
 
   private handleError(operation: string = 'operation') {
