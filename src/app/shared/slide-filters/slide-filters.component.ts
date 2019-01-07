@@ -1,16 +1,13 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute, RouterEvent } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/internal/operators';
-import { SESSION_STORAGE, StorageService } from 'ngx-webstorage-service';
+import { debounceTime, distinctUntilChanged, startWith, map, skip, take } from 'rxjs/internal/operators';
 
 import { appConfig } from 'appConfig';
 import { ICountryListModel } from '@shared/models/country-list.interface';
 import { ICategoryListInterface } from '@shared/models/category-list.interface';
 import { ContextService } from '@shared/context.service';
-
-const STORAGE_KEY = 'youtube_filters';
 
 @Component({
   selector   : 'app-slide-filters',
@@ -39,7 +36,7 @@ export class SlideFiltersComponent implements OnInit {
 
   constructor(private appContext: ContextService,
               private router: Router,
-              @Inject(SESSION_STORAGE) public storage: StorageService) {
+              private route: ActivatedRoute) {
 
     this.countryList$ = this.countryFormControl.valueChanges
       .pipe(
@@ -56,6 +53,10 @@ export class SlideFiltersComponent implements OnInit {
   public updateCategories(categories) {
     this.categories = categories;
     console.log(this.categories);
+    if (categories.length === 0) {
+      this.categoryFormControl.setValue('No Categories for this country');
+      this.defaultRoute();
+    }
 
     this.categoriesList$ = this.categoryFormControl.valueChanges
       .pipe(
@@ -107,58 +108,66 @@ export class SlideFiltersComponent implements OnInit {
       });
   }
 
-  public loadCountryTrend(country) {
-
-  }
-
-  public loadCategoryTrend(category) {
-
-  }
-
-  public onChangeVideosPerPage(count: number) {
-
-  }
-
-  // public saveState() {
-  //   this.storage.set(STORAGE_KEY, {
-  //      videosOnPage: this.count
-  //    });
-  // }
-
   private setDefaults() {
-    const savedFilters = this.storage.get(STORAGE_KEY);
 
-    // if (savedFilters) {
-    //   console.log(savedFilters);
-    //   this.appContext.videosCountPerPage.next(savedFilters.videosOnPage);
-    // }
+    this.router.events.subscribe((event: RouterEvent) => {
+      if (event.url === '/youtube' || event.url === '/') {
+        this.defaultRoute();
+      }
+    });
 
-    if (!this.countryCode || !this.categoryId || !this.count ) {
-
-      this.appContext.selectedCountry.subscribe((countryCode) => {
-        this.countryCode = countryCode;
-        const defaultCountry = this.countries.find((country) => country.code === countryCode).name;
+    this.route.queryParams
+    .pipe(skip(1), take(1))
+    .subscribe((params) => {
+      if (params.hasOwnProperty('count') && params.hasOwnProperty('country') && params.hasOwnProperty('category')) {
+        this.countryCode = params.country;
+        const defaultCountry = this.countries.find((country) => country.code === this.countryCode).name;
         this.countryFormControl.setValue(defaultCountry);
-      });
 
-      this.appContext.selectedCategory.subscribe((categoryId) => {
-        this.categoryId = categoryId;
-      });
+        this.categoryId = params.category;
 
-      this.appContext.videosCategoryList.subscribe((categories) => {
-        if (categories.length) {
+        this.appContext.videosCategoryList.subscribe((categories) => {
+          if (categories.length) {
+            // tslint:disable-next-line:triple-equals
+            const defaultCategory = categories.find((category) => category.id == this.categoryId).name;
+            this.categoryFormControl.setValue(defaultCategory);
+          }
+        });
+
+        this.count = params.count;
+        this.videosPerPageFormControl.setValue(this.count);
+
+        this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
+      } else {
+        this.defaultRoute();
+      }
+    });
+
+  }
+
+  public defaultRoute() {
+    this.appContext.selectedCountry.subscribe((countryCode) => {
+      this.countryCode = countryCode;
+      const defaultCountry = this.countries.find((country) => country.code === countryCode).name;
+      this.countryFormControl.setValue(defaultCountry);
+    });
+    this.appContext.selectedCategory.subscribe((categoryId) => {
+      this.categoryId = categoryId;
+    });
+
+    this.appContext.videosCategoryList.subscribe((categories) => {
+      if (categories.length) {
         // tslint:disable-next-line:triple-equals
         const defaultCategory = categories.find((category) => category.id == this.categoryId).name;
         this.categoryFormControl.setValue(defaultCategory);
-        }
-      });
+      }
+    });
 
-      this.appContext.videosCountPerPage.subscribe((count) => {
-        this.count = count;
-        this.videosPerPageFormControl.setValue(count);
-      });
+    this.appContext.videosCountPerPage.subscribe((count) => {
+      this.count = count;
+      this.videosPerPageFormControl.setValue(count);
+    });
 
-      this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
-    }
+    this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
   }
 }
