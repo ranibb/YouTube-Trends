@@ -12,7 +12,9 @@ import {
   MatButtonModule,
   MatIconModule,
   MatInputModule,
-  MatSidenavModule, MatSliderModule
+  MatSidenavModule,
+  MatSliderModule,
+  MatSlideToggleModule
 } from '@angular/material';
 
 /* Application routes */
@@ -43,6 +45,7 @@ import { WINDOW_PROVIDERS } from './service/window.service';
     MatSidenavModule,
     MatSliderModule,
     StorageServiceModule,
+    MatSlideToggleModule,
     RouterModule.forRoot(ROUTES, {
       useHash           : Boolean(history.pushState) === false,
       preloadingStrategy: PreloadAllModules

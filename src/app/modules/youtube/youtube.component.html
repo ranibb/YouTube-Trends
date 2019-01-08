@@ -5,10 +5,10 @@
               *ngFor="let video of videos">
           <app-video-component [video]="video"></app-video-component>
         </div>
-        <mat-progress-bar mode="indeterminate" *ngIf="nextTokenScroll; else theEnd"></mat-progress-bar>
+        <mat-progress-bar mode="indeterminate" *ngIf="nextTokenScroll && infiniteScrollchecked; else theEnd"></mat-progress-bar>
         <ng-template class="endOfVideos" #theEnd>
-            <div class="end-text">
-                <h1 class="text-center">You have seen all the videos for this category. To see more select another</h1>
+            <div class="end-text" *ngIf="!nextTokenScroll">
+                <h1 class="text-center">You have seen all the videos for this category. To see more select another.</h1>
             </div>
         </ng-template>
         <span #bottomEl></span>

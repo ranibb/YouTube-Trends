@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Inject } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router, ActivatedRoute, RouterEvent } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
@@ -33,6 +33,9 @@ export class SlideFiltersComponent implements OnInit {
   public videosPerPageFormControl: FormControl = new FormControl();
   public defaultVideosOnPage: number = appConfig.maxVideosToLoad;
   public count: number;
+
+  public infiniteScrollFormControl: FormControl = new FormControl();
+  infiniteScrollchecked = false;
 
   constructor(private appContext: ContextService,
               private router: Router,
@@ -104,7 +107,22 @@ export class SlideFiltersComponent implements OnInit {
       .subscribe((count) => {
         this.count = count;
         this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
-        // this.saveState();
+      });
+
+    this.infiniteScrollFormControl.valueChanges
+      .subscribe((value) => {
+        if (value) {
+          this.infiniteScrollchecked = true;
+          this.videosPerPageFormControl.disable();
+          this.videosPerPageFormControl.setValue(this.count);
+          this.defaultRoute(24, this.countryCode, this.categoryId);
+          this.appContext.scrollPageOnOff.next(this.infiniteScrollchecked);
+        } else {
+          this.infiniteScrollchecked = false;
+          this.videosPerPageFormControl.enable();
+          this.appContext.scrollPageOnOff.next(this.infiniteScrollchecked);
+          this.defaultRoute(this.count, this.countryCode, this.categoryId);
+        }
       });
   }
 
@@ -139,20 +157,20 @@ export class SlideFiltersComponent implements OnInit {
 
         this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
       } else {
-        this.defaultRoute();
+        this.defaultRoute(this.count, this.countryCode, this.categoryId);
       }
     });
 
   }
 
-  public defaultRoute() {
+  public defaultRoute(vCount?, sCountry?, sCategory?) {
     this.appContext.selectedCountry.subscribe((countryCode) => {
-      this.countryCode = countryCode;
-      const defaultCountry = this.countries.find((country) => country.code === countryCode).name;
+      this.countryCode = sCountry ? sCountry : countryCode;
+      const defaultCountry = this.countries.find((country) => country.code === this.countryCode).name;
       this.countryFormControl.setValue(defaultCountry);
     });
     this.appContext.selectedCategory.subscribe((categoryId) => {
-      this.categoryId = categoryId;
+      this.categoryId = sCategory ? sCategory : categoryId;
     });
 
     this.appContext.videosCategoryList.subscribe((categories) => {
@@ -164,7 +182,7 @@ export class SlideFiltersComponent implements OnInit {
     });
 
     this.appContext.videosCountPerPage.subscribe((count) => {
-      this.count = count;
+      this.count = vCount ? vCount : count;
       this.videosPerPageFormControl.setValue(count);
     });
 

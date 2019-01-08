@@ -1,5 +1,5 @@
-import { Component, OnInit, HostListener, ViewChild, ElementRef, Inject } from '@angular/core';
-import { Observable, Subject, BehaviorSubject, Subscription } from 'rxjs';
+import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
+import { Observable, Subject, BehaviorSubject, Subscription, fromEvent } from 'rxjs';
 import { catchError, map } from 'rxjs/internal/operators';
 import { throwError } from 'rxjs/index';
 import { ActivatedRoute } from '@angular/router';
@@ -22,6 +22,7 @@ export class YoutubeComponent implements OnInit {
 
   private inPosition: boolean;
   private nextTokenScroll: string;
+  public infiniteScrollchecked: boolean;
 
   public trendingVideos$: Observable<VideoClass[]>;
   private newVideos$ = new BehaviorSubject<VideoClass[]>([]);
@@ -29,6 +30,7 @@ export class YoutubeComponent implements OnInit {
   private videos: VideoClass[] = [];
   public params: LoadVidoesParam = new LoadVidoesParam();
   public videoLoader: boolean;
+  public scrollSubscription: Subscription;
 
   constructor(private youtubeService: YoutubeService,
               private appContext: ContextService,
@@ -40,11 +42,15 @@ export class YoutubeComponent implements OnInit {
     this.appContext.hideSideNavGear.next(false);
     this.appContext.moduleTitle.next('YOUTUBE');
     this.route.queryParams.subscribe((data) => this.videosfunc(data.count, data.country, data.category));
+    this.appContext.scrollPageOnOff.subscribe((infiniteScrollchecked) => {
+      this.infiniteScrollchecked = infiniteScrollchecked;
+      this.activateOnScroll(infiniteScrollchecked);
+    });
     this.appContext.scrollPageToken.subscribe((d) => this.nextTokenScroll = d);
     this.trendingVideos$ = this.newVideos$.pipe(
       map((data) => {
          this.videos = [...this.videos, ...data];
-        //  console.log(this.videos);
+        //  console.log(this.videos.length);
          return this.videos;
       }));
   }
@@ -102,8 +108,21 @@ export class YoutubeComponent implements OnInit {
       ).subscribe((newVideos) => this.newVideos$.next(newVideos));
   }
 
-  @HostListener('window:scroll', ['$event'])
+  private activateOnScroll(infiniteScrollchecked) {
+    if (infiniteScrollchecked) {
+      this.scrollSubscription = fromEvent(window, 'scroll').subscribe((e) => {
+        this.onScroll(e);
+      });
+    } else {
+      if (this.scrollSubscription) {
+        this.scrollSubscription.unsubscribe();
+      }
+    }
+
+  }
+
   onScroll($event) {
+    console.log('scrolling...');
     const inPosition = this.isSrollIntoViewPoint(
       this.bottomEl.nativeElement,
       this.window,

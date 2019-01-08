@@ -40,9 +40,15 @@
   <mat-slider
     thumbLabel
     tickInterval="1"
-    [min]="20"
+    [min]="1"
     [max]="200"
     [thumbLabel]="true"
     [formControl]="videosPerPageFormControl"
     [value]="defaultVideosOnPage"></mat-slider>
 </div>
+
+<mat-slide-toggle
+    class="example-margin"
+    [checked]="infiniteScrollchecked"
+    [formControl]="infiniteScrollFormControl">
+  Infinite Scroll is {{infiniteScrollchecked}}</mat-slide-toggle>

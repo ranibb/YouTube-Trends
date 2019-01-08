@@ -15,4 +15,5 @@ export class ContextService {
   public pageToken: Subject<string> = new Subject<string>();
   public videosCategoryList: Subject<VideoCategoryClass[]> = new Subject<VideoCategoryClass[]>();
   public scrollPageToken: Subject<string> = new Subject<string>();
+  public scrollPageOnOff: Subject<boolean> = new Subject<boolean>();
 }
