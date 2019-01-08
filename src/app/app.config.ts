@@ -1,7 +1,7 @@
 export const appConfig = {
   getYoutubeEndPoint : (url: string) => `https://www.googleapis.com/youtube/v3/${url}`,
   getYoutubeEmbdedUrl: (id: string) => `https://www.youtube.com/embed/${id}??autoplay=1`,
-  youtubeApiKey      : 'AIzaSyCCwLsO1Z8-ubGs-qPjjNjaOK0WhaVY4UM',
+  youtubeApiKey      : 'AIzaSyA5FSwzrACgkTc14GLGvXEQBvRR_Gz7VeM',
   partsToLoad        : 'snippet, statistics',
   chart              : 'mostPopular',
   defaultRegion      : 'US',

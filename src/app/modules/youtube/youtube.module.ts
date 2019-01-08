@@ -12,7 +12,8 @@ import { ROUTES } from './youtube.routes';
 import {
   MatButtonModule,
   MatIconModule,
-  MatSidenavModule
+  MatSidenavModule,
+  MatProgressBarModule
 } from '@angular/material';
 
 /* Components/Services/Pipes */
@@ -37,6 +38,7 @@ import { SafePipe } from './safe.pipe';
     MatIconModule,
     MatSidenavModule,
     MomentModule,
+    MatProgressBarModule,
     RouterModule.forChild(ROUTES)
   ],
   providers   : [ YoutubeService ],

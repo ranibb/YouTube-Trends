@@ -14,4 +14,5 @@ export class ContextService {
   public embedUrlInAppContext: BehaviorSubject<string> = new BehaviorSubject<string>(null);
   public pageToken: Subject<string> = new Subject<string>();
   public videosCategoryList: Subject<VideoCategoryClass[]> = new Subject<VideoCategoryClass[]>();
+  public scrollPageToken: Subject<string> = new Subject<string>();
 }

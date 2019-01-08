@@ -23,6 +23,7 @@ import { AppComponent } from './app.component';
 import { ContextService } from '@shared/context.service';
 import { HeaderComponent } from '@shared/header/header.component';
 import { SlideFiltersComponent } from '@shared/slide-filters/slide-filters.component';
+import { WINDOW_PROVIDERS } from './service/window.service';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,7 @@ import { SlideFiltersComponent } from '@shared/slide-filters/slide-filters.compo
       preloadingStrategy: PreloadAllModules
     })
   ],
-  providers   : [ ContextService ],
+  providers   : [ ContextService, WINDOW_PROVIDERS ],
   bootstrap   : [ AppComponent ]
 })
 

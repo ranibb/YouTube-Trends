@@ -52,7 +52,7 @@ export class SlideFiltersComponent implements OnInit {
 
   public updateCategories(categories) {
     this.categories = categories;
-    console.log(this.categories);
+    // console.log(this.categories);
     if (categories.length === 0) {
       this.categoryFormControl.setValue('No Categories for this country');
       this.defaultRoute();

@@ -1,10 +1,19 @@
-<div id="youtube" *ngIf="(trendingVideos$ | async) as videos; else loadingOrError">
-  <div class="row">
-    <div class="card-container"
-         *ngFor="let video of videos">
-      <app-video-component [video]="video"></app-video-component>
+<div *ngIf="(trendingVideos$ | async) as videos">
+  <div id="youtube" *ngIf="videos.length > 0; else loadingOrError">
+      <div class="row">
+        <div class="card-container"
+              *ngFor="let video of videos">
+          <app-video-component [video]="video"></app-video-component>
+        </div>
+        <mat-progress-bar mode="indeterminate" *ngIf="nextTokenScroll; else theEnd"></mat-progress-bar>
+        <ng-template class="endOfVideos" #theEnd>
+            <div class="end-text">
+                <h1 class="text-center">You have seen all the videos for this category. To see more select another</h1>
+            </div>
+        </ng-template>
+        <span #bottomEl></span>
+      </div>
     </div>
-  </div>
 </div>
 
 <ng-template #loadingOrError>
@@ -14,6 +23,8 @@
   </div>
 
   <ng-template class="gl-loading showLoading" #loading>
-    <div class="spinner"></div>
+    <div class="spinner-container">
+      <div class="spinner"></div>
+    </div>
   </ng-template>
 </ng-template>

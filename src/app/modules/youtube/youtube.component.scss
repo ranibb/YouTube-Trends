@@ -9,6 +9,14 @@
   position         : fixed;
 }
 
+.spinner-container {
+    height: calc(100vh - 53px);
+}
+
+.end-text {
+    width: 100%;
+}
+
 #youtube {
   min-height       : calc(100% + 30px);
   background-color : #fdfbec;
@@ -53,4 +61,9 @@
     width     : 50px;
     height    : 35px;
   }
+}
+
+.btn_left {
+  position: absolute;
+  right: 0;
 }
