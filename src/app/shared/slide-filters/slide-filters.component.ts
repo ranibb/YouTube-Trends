@@ -57,8 +57,14 @@ export class SlideFiltersComponent implements OnInit {
     this.categories = categories;
     // console.log(this.categories);
     if (categories.length === 0) {
+      this.countryFormControl.setValue('N/A Resetting filters...');
       this.categoryFormControl.setValue('No Categories for this country');
-      this.defaultRoute();
+      setTimeout(() => {
+        this.appContext.selectedCountry.next(appConfig.defaultRegion);
+        this.appContext.selectedCategory.next(appConfig.defaultCategoryId);
+        this.appContext.videosCountPerPage.next(appConfig.maxVideosToLoad);
+        this.defaultRoute();
+      }, 2500);
     }
 
     this.categoriesList$ = this.categoryFormControl.valueChanges
@@ -83,20 +89,26 @@ export class SlideFiltersComponent implements OnInit {
     this.setDefaults();
 
     this.countryFormControl.valueChanges
+    .pipe(
+      distinctUntilChanged())
       .subscribe((value) => {
       const country = appConfig.countryList.find((obj) => obj.name === value);
       if (country) {
         this.countryCode = country.code;
         this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
+        this.appContext.selectedCountry.next(this.countryCode);
       }
     });
 
     this.categoryFormControl.valueChanges
+    .pipe(
+      distinctUntilChanged())
       .subscribe((value) => {
         const category = this.categories.find((item) => item.name === value);
         if (category) {
           this.categoryId = category.id;
           this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
+          this.appContext.selectedCategory.next(this.categoryId);
         }
       });
 
@@ -107,6 +119,7 @@ export class SlideFiltersComponent implements OnInit {
       .subscribe((count) => {
         this.count = count;
         this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
+        this.appContext.videosCountPerPage.next(this.count);
       });
 
     this.infiniteScrollFormControl.valueChanges

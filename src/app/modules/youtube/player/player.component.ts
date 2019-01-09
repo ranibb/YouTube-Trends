@@ -15,6 +15,10 @@ export class PlayerComponent implements OnInit {
   public embedUrl: string;
   public videoLoader: boolean;
 
+  public countryCode: string;
+  public categoryId: number;
+  public count: number;
+
   @ViewChild('videoFrame')
   videoFrame: ElementRef;
 
@@ -25,6 +29,9 @@ export class PlayerComponent implements OnInit {
 
   public ngOnInit() {
     this.appContext.hideSideNavGear.next(true);
+    this.appContext.selectedCountry.subscribe((countryCode) => this.countryCode = countryCode);
+    this.appContext.selectedCategory.subscribe((categoryId) => this.categoryId = categoryId);
+    this.appContext.videosCountPerPage.subscribe((count) => this.count = count);
     this.appContext.embedUrlInAppContext
       .pipe(first())
       .subscribe((embedUrl) => {
@@ -34,12 +41,12 @@ export class PlayerComponent implements OnInit {
         } else {
           this.videoLoader = true;
           const id = this.route.snapshot.paramMap.get('videoId');
-          if (!id.length) { this.router.navigate(['/youtube']); }
+          if (!id.length) { this.goBack(); }
           this.youtubeService.checkVideoExist(id)
             .subscribe((data) => {
               if (data.items.length > 0) {
                 this.embedUrl = appConfig.getYoutubeEmbdedUrl(id);
-              } else { this.router.navigate(['/youtube']); }
+              } else { this.goBack(); }
             });
         }
       });
@@ -53,6 +60,10 @@ export class PlayerComponent implements OnInit {
     } else {
       this.videoLoader = false;
     }
+  }
+
+  public goBack() {
+    this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
   }
 
 }
