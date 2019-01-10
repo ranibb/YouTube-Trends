@@ -128,13 +128,14 @@ export class SlideFiltersComponent implements OnInit {
           this.infiniteScrollchecked = true;
           this.videosPerPageFormControl.disable();
           this.videosPerPageFormControl.setValue(this.count);
-          this.defaultRoute(24, this.countryCode, this.categoryId);
+          this.appContext.videosCountPerPage.next(24);
+          this.defaultRoute();
           this.appContext.scrollPageOnOff.next(this.infiniteScrollchecked);
         } else {
           this.infiniteScrollchecked = false;
           this.videosPerPageFormControl.enable();
           this.appContext.scrollPageOnOff.next(this.infiniteScrollchecked);
-          this.defaultRoute(this.count, this.countryCode, this.categoryId);
+          this.defaultRoute();
         }
       });
   }
@@ -170,20 +171,20 @@ export class SlideFiltersComponent implements OnInit {
 
         this.router.navigate(['/youtube'], { queryParams: { count: this.count, country: this.countryCode, category: this.categoryId } });
       } else {
-        this.defaultRoute(this.count, this.countryCode, this.categoryId);
+        this.defaultRoute();
       }
     });
 
   }
 
-  public defaultRoute(vCount?, sCountry?, sCategory?) {
+  public defaultRoute() {
     this.appContext.selectedCountry.subscribe((countryCode) => {
-      this.countryCode = sCountry ? sCountry : countryCode;
+      this.countryCode =  countryCode;
       const defaultCountry = this.countries.find((country) => country.code === this.countryCode).name;
       this.countryFormControl.setValue(defaultCountry);
     });
     this.appContext.selectedCategory.subscribe((categoryId) => {
-      this.categoryId = sCategory ? sCategory : categoryId;
+      this.categoryId =  categoryId;
     });
 
     this.appContext.videosCategoryList.subscribe((categories) => {
@@ -195,7 +196,7 @@ export class SlideFiltersComponent implements OnInit {
     });
 
     this.appContext.videosCountPerPage.subscribe((count) => {
-      this.count = vCount ? vCount : count;
+      this.count = count;
       this.videosPerPageFormControl.setValue(count);
     });
 
